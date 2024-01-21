@@ -1,8 +1,10 @@
-import 'package:meta/meta.dart';
+import 'package:dartz/dartz.dart';
+import 'package:flutter/foundation.dart';
+import 'package:reso_note/domain/core/failures.dart';
 
 @immutable
 class EmailAddress {
-  final String value;
+  final Either<ValueFailure<String>, String> value;
 
   factory EmailAddress(String input) {
     return EmailAddress._(
@@ -25,19 +27,29 @@ class EmailAddress {
   int get hashCode => value.hashCode;
 }
 
-String validateEmailAddress(String input) {
-  // Maybe not the most robust way of email validation but it's good enough
+Either<ValueFailure<String>, String> validateEmailAddress(String input) {
   const emailRegex =
       r"""^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+""";
   if (RegExp(emailRegex).hasMatch(input)) {
-    return input;
+    return right(input);
   } else {
-    throw InvalidEmailException(failedValue: input);
+    return left(ValueFailure.invalidEmail(failedValue: input));
   }
 }
 
-class InvalidEmailException implements Exception {
-  final String failedValue;
+// String validateEmailAddress(String input) {
+//   // Maybe not the most robust way of email validation but it's good enough
+//   const emailRegex =
+//       r"""^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+""";
+//   if (RegExp(emailRegex).hasMatch(input)) {
+//     return input;
+//   } else {
+//     throw InvalidEmailException(failedValue: input);
+//   }
+// }
 
-  InvalidEmailException({required this.failedValue});
-}
+// class InvalidEmailException implements Exception {
+//   final String failedValue;
+
+//   InvalidEmailException({required this.failedValue});
+// }
